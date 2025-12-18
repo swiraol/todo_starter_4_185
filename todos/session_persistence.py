@@ -5,6 +5,7 @@ class SessionPersistence:
         self.session = session
         if 'lists' not in self.session:
             self.session['lists'] = []
+            
     def find_list(self, list_id):
         found = (lst for lst in self.session['lists'] if list_id == lst['id'])
         return next(found, None)
@@ -40,4 +41,11 @@ class SessionPersistence:
                 'completed': False,
             })
             self.session.modified = True 
-            
+
+    def update_todo_status(self, list_id, todo_id, todo_status):
+        lst = self.find_list(list_id)
+        if lst:
+            for todo in lst['todos']: 
+                if todo_id == todo['id']:
+                    todo['completed'] = todo_status
+                    self.session.modified = True 

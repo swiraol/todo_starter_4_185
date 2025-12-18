@@ -28,7 +28,8 @@ from todos.utils import (
 from todos.session_persistence import SessionPersistence
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(32)
+# app.secret_key = secrets.token_hex(32)
+app.secret_key = 'development-secret-key'
 
 def require_list(f):
     @wraps(f)
@@ -116,10 +117,10 @@ def create_todo(lst, list_id):
 @app.route("/lists/<list_id>/todos/<todo_id>/toggle", methods=["POST"])
 @require_todo
 def update_todo_status(lst, todo, list_id, todo_id):
-    todo['completed'] = (request.form['completed'] == 'True')
+    todo_status = (request.form['completed'] == 'True')
+    g.storage.update_todo_status(list_id, todo_id, todo_status)
 
     flash("The todo has been updated.", "success")
-    session.modified = True
     return redirect(url_for('show_list', list_id=list_id))
 
 @app.route("/lists/<list_id>/todos/<todo_id>/delete", methods=["POST"])
