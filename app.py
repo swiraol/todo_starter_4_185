@@ -14,13 +14,11 @@ from flask import (
 )
 from werkzeug.exceptions import NotFound
 from todos.utils import (
-    delete_todo_by_id,
     error_for_list_title, 
     error_for_todo, 
     find_todo_by_id,
     is_list_completed,
     is_todo_completed,
-    mark_all_completed,
     sort_items,
     todos_remaining,
 )
@@ -134,10 +132,9 @@ def delete_todo(lst, todo, list_id, todo_id):
 @app.route("/lists/<list_id>/complete_all", methods=["POST"])
 @require_list
 def mark_all_todos_completed(lst, list_id):
-    mark_all_completed(lst)
+    g.storage.mark_all_completed(list_id)
 
     flash("All todos have been updated.", "success")
-    session.modified = True
     return redirect(url_for('show_list', list_id=list_id))
 
 @app.route("/lists/<list_id>/edit")
