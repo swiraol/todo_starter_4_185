@@ -49,8 +49,9 @@ class SessionPersistence:
                 if todo_id == todo['id']:
                     todo['completed'] = todo_status
                     self.session.modified = True 
+                    break
     
-    def delete_todo_by_id(self, list_id, todo_id):
+    def delete_todo_from_list(self, list_id, todo_id):
         lst = self.find_list(list_id)
 
         if lst: 
