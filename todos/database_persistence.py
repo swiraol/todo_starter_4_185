@@ -28,9 +28,11 @@ class DatabasePersistence:
                 cursor.execute(query, (list_id,))
                 result = cursor.fetchone()
         lst = dict(result)
-        lst.setdefault('todos', [])
-
+        todos = self._find_todos_for_list(list_id)
+        lst.setdefault('todos', todos)
+        
         return lst
+        
     
     def all_lists(self):
         query = "SELECT * FROM lists"
@@ -42,7 +44,8 @@ class DatabasePersistence:
                 results = cursor.fetchall()
         lists = [dict(result) for result in results]
         for lst in lists:
-            lst.setdefault('todos', [])
+            todos = self._find_todos_for_list(lst['id'])
+            lst.setdefault('todos', todos)
         
         return lists
     
@@ -54,6 +57,16 @@ class DatabasePersistence:
     
     def delete_list(self, list_id):
         pass
+
+    def _find_todos_for_list(self, list_id):
+        query = "SELECT * FROM todos WHERE list_id = %s"
+        logger.info("Executing query: %s where list_id: %s", query, list_id)
+        with self._database_connect() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute(query, (list_id,))
+                results = cursor.fetchall()
+
+        return results
     
     def create_new_todo(self, list_id, todo_title):
         pass
