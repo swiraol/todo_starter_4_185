@@ -21,6 +21,7 @@ class DatabasePersistence:
 
         finally:
             connection.close()
+
     def find_list(self, list_id):
         query = "SELECT * FROM lists WHERE id = %s"
         with self._database_connect() as conn:
@@ -84,13 +85,33 @@ class DatabasePersistence:
         return results
     
     def create_new_todo(self, list_id, todo_title):
-        pass
+        query = "INSERT INTO todos (title, list_id) VALUES (%s, %s)"
+        logger.info("Executing query: %s with title: %s and list_id: %s", query, todo_title, list_id)
+
+        with self._database_connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (todo_title, list_id,))
 
     def update_todo_status(self, list_id, todo_id, todo_status):
-        pass
-    
+        query = "UPDATE todos SET completed = %s WHERE list_id = %s and id = %s"
+        logger.info("Executing query: %s with todo_status: %s, list_id: %s and id: %s", query, todo_status, list_id, todo_id)
+
+        with self._database_connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (todo_status, list_id, todo_id,))
+
     def delete_todo_from_list(self, list_id, todo_id):
-        pass
+        query = "DELETE FROM todos WHERE list_id = %s and id = %s"
+        logger.info("Executing query: %s with list_id: %s and id: %s", query, list_id, todo_id)
+
+        with self._database_connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (list_id, todo_id,))
     
     def mark_all_completed(self, list_id):
-        pass
+        query = "UPDATE todos SET completed = True WHERE list_id = %s"
+        logger.info("Executing query: %s with list_id: %s", query, list_id)
+
+        with self._database_connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (list_id,))
